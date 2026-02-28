@@ -2,11 +2,11 @@ import PrivacyNotice from './PrivacyNotice';
 
 export default function WelcomeScreen({ onSelectRole }) {
   return (
-    <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-      <div className="max-w-md w-full text-center space-y-8">
-        <div>
-          <span className="text-5xl block mb-4" aria-hidden="true">🌿</span>
-          <h2 className="text-2xl font-semibold text-warmgray mb-3">
+    <main className="flex-1 overflow-y-auto">
+      <div className="max-w-md w-full mx-auto px-6 py-8 space-y-6 flex flex-col justify-center min-h-full">
+        <div className="text-center">
+          <span className="text-4xl block mb-3" aria-hidden="true">🌿</span>
+          <h2 className="text-xl sm:text-2xl font-semibold text-warmgray mb-2">
             Welcome to Your Bladder Health Guide
           </h2>
           <p className="text-gray-600 leading-relaxed" style={{ fontSize: 'var(--chat-font-size, 17px)' }}>
@@ -30,9 +30,9 @@ export default function WelcomeScreen({ onSelectRole }) {
           </button>
         </div>
 
-        <aside className="pt-2 space-y-3">
+        <aside className="space-y-2 text-center">
           <PrivacyNotice />
-          <p className="text-xs text-gray-400 text-center">
+          <p className="text-xs text-gray-400">
             Prefiero español <span className="text-gray-300">(coming soon)</span>
           </p>
         </aside>

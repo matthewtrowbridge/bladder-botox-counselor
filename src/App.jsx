@@ -54,7 +54,7 @@ function AppContent() {
   };
 
   return (
-    <div className="h-full flex flex-col bg-offwhite max-w-2xl mx-auto shadow-sm">
+    <div className="h-dvh h-full flex flex-col bg-offwhite max-w-2xl mx-auto shadow-sm overflow-hidden">
       <Header
         showRestart={phase !== 'welcome'}
         onRestart={handleRestart}
