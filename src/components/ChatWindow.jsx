@@ -3,6 +3,7 @@ import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 import QuickReplies from './QuickReplies';
 import PrivacyNotice from './PrivacyNotice';
+import { useSpeech } from '../hooks/useSpeech';
 
 export default function ChatWindow({
   messages,
@@ -13,7 +14,7 @@ export default function ChatWindow({
 }) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
-  const inputRef = useRef(null);
+  const { speak, speakingId } = useSpeech();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -27,12 +28,29 @@ export default function ChatWindow({
     setInput('');
   };
 
+  const handleRephrase = (originalText, mode) => {
+    const prompts = {
+      simpler: `Can you explain this in simpler words? Here's what you said: "${originalText.slice(0, 200)}"`,
+      list: `Can you turn that into a short bullet-point list? Here's what you said: "${originalText.slice(0, 200)}"`,
+      child: `Can you explain that like you would to a child? Here's what you said: "${originalText.slice(0, 200)}"`,
+    };
+    onSend(prompts[mode] || `Can you explain that differently?`);
+  };
+
   return (
     <div className="flex-1 flex flex-col min-h-0">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto chat-scroll px-4 py-4 space-y-3">
         {messages.map((msg, i) => (
-          <MessageBubble key={i} role={msg.role} content={msg.content} />
+          <MessageBubble
+            key={i}
+            role={msg.role}
+            content={msg.content}
+            index={i}
+            speakingId={speakingId}
+            onSpeak={speak}
+            onRephrase={handleRephrase}
+          />
         ))}
         {isLoading && <TypingIndicator />}
         <div ref={messagesEndRef} />
@@ -49,13 +67,13 @@ export default function ChatWindow({
       <div className="border-t border-gray-200 bg-white px-4 py-3">
         <form onSubmit={handleSubmit} className="flex gap-2">
           <input
-            ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your question..."
             disabled={isLoading}
-            className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-[17px] text-warmgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent disabled:opacity-50"
+            className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-warmgray placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent disabled:opacity-50"
+            style={{ fontSize: 'var(--chat-font-size, 17px)' }}
           />
           <button
             type="submit"

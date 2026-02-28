@@ -5,6 +5,7 @@ import WelcomeScreen from './components/WelcomeScreen';
 import ChatWindow from './components/ChatWindow';
 import HandoffSummary from './components/HandoffSummary';
 import { useChat } from './hooks/useChat';
+import { useFontSize } from './hooks/useFontSize';
 
 function AppContent() {
   const {
@@ -19,6 +20,7 @@ function AppContent() {
     resetChat,
   } = useChat();
 
+  const { sizeLabel, cycle } = useFontSize();
   const [handoffData, setHandoffData] = useState(null);
 
   const handleQuickReply = async (text) => {
@@ -53,7 +55,12 @@ function AppContent() {
 
   return (
     <div className="h-full flex flex-col bg-offwhite max-w-2xl mx-auto shadow-sm">
-      <Header showRestart={phase !== 'welcome'} onRestart={handleRestart} />
+      <Header
+        showRestart={phase !== 'welcome'}
+        onRestart={handleRestart}
+        fontSizeLabel={sizeLabel}
+        onCycleFont={cycle}
+      />
 
       {phase === 'welcome' && <WelcomeScreen onSelectRole={startChat} />}
 
