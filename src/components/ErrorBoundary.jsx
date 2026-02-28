@@ -17,9 +17,12 @@ export default class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="h-full flex flex-col items-center justify-center px-6 py-12 bg-offwhite">
+        <div
+          role="alert"
+          className="h-full flex flex-col items-center justify-center px-6 py-12 bg-offwhite"
+        >
           <div className="max-w-md text-center space-y-4">
-            <span className="text-4xl block">😔</span>
+            <span className="text-4xl block" aria-hidden="true">😔</span>
             <h2 className="text-xl font-semibold text-warmgray">
               Something went wrong
             </h2>

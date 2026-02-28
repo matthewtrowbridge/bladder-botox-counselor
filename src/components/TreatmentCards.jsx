@@ -57,29 +57,39 @@ function TreatmentCard({ treatment }) {
   return (
     <div
       className={`bg-white rounded-xl border-2 ${treatment.color} overflow-hidden transition-all`}
+      role="group"
+      aria-label={`${treatment.name}: ${treatment.efficacy} effective`}
     >
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full text-left p-4"
+        className="w-full text-left p-4 min-h-0"
+        aria-expanded={expanded}
+        aria-label={`${treatment.name} — ${treatment.tagline}. ${expanded ? 'Collapse' : 'Expand'} details.`}
       >
         <div className="flex items-center gap-3 mb-2">
-          <span className="text-2xl">{treatment.icon}</span>
+          <span className="text-2xl" aria-hidden="true">{treatment.icon}</span>
           <div className="flex-1">
             <h4 className="text-sm font-semibold text-warmgray">{treatment.name}</h4>
             <p className="text-xs text-gray-500">{treatment.tagline}</p>
           </div>
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-400" aria-hidden="true">
             {expanded ? '▲' : '▼'}
           </span>
         </div>
 
-        {/* Efficacy bar */}
         <div className="mt-2">
           <div className="flex justify-between text-xs mb-1">
             <span className="text-gray-500">How well it works</span>
             <span className="font-semibold text-warmgray">{treatment.efficacy}</span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-2.5">
+          <div
+            className="w-full bg-gray-100 rounded-full h-2.5"
+            role="progressbar"
+            aria-valuenow={treatment.efficacyBar}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Effectiveness: ${treatment.efficacy}`}
+          >
             <div
               className={`h-2.5 rounded-full ${treatment.bgColor} transition-all duration-500`}
               style={{ width: `${treatment.efficacyBar}%` }}
@@ -89,14 +99,14 @@ function TreatmentCard({ treatment }) {
       </button>
 
       {expanded && (
-        <div className="px-4 pb-4 pt-1 border-t border-gray-100 space-y-2">
+        <dl className="px-4 pb-4 pt-1 border-t border-gray-100 space-y-2">
           {treatment.highlights.map((h) => (
             <div key={h.label} className="flex gap-2 text-sm">
-              <span className="text-gray-400 font-medium shrink-0 w-24">{h.label}</span>
-              <span className="text-warmgray">{h.value}</span>
+              <dt className="text-gray-500 font-medium shrink-0 w-24">{h.label}</dt>
+              <dd className="text-warmgray m-0">{h.value}</dd>
             </div>
           ))}
-        </div>
+        </dl>
       )}
     </div>
   );
@@ -104,14 +114,14 @@ function TreatmentCard({ treatment }) {
 
 export default function TreatmentCards() {
   return (
-    <div className="my-3 space-y-2 message-enter">
+    <div className="my-3 space-y-2 message-enter" role="region" aria-label="Treatment comparison">
       <h3 className="text-sm font-semibold text-warmgray px-1 mb-2">
         Your Treatment Options — tap to compare
       </h3>
       {TREATMENTS.map((t) => (
         <TreatmentCard key={t.name} treatment={t} />
       ))}
-      <p className="text-xs text-gray-400 text-center pt-1">
+      <p className="text-xs text-gray-500 text-center pt-1">
         None is clearly best — it depends on what matters most to you.
         Dr. Trowbridge can help you decide.
       </p>
@@ -119,7 +129,6 @@ export default function TreatmentCards() {
   );
 }
 
-// Detect when treatment comparison should show
 export function shouldShowTreatmentCards(text) {
   return /three (main )?(option|approach|treatment)|compare|side by side|all.*(option|treatment)|other option|PTNS.*SNM|SNM.*PTNS|botox.*nerve|three.*advanced/i.test(text);
 }

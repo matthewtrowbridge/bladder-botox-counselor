@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
 const PERSON_ICON = (filled) => (
-  <svg viewBox="0 0 12 20" className={`w-3 h-5 ${filled ? '' : 'opacity-20'}`}>
-    <circle cx="6" cy="3" r="2.5" fill={filled ? 'currentColor' : '#ccc'} />
+  <svg viewBox="0 0 12 20" className={`w-3 h-5 ${filled ? '' : 'opacity-30'}`} aria-hidden="true">
+    <circle cx="6" cy="3" r="2.5" fill={filled ? 'currentColor' : '#999'} />
     <path
       d="M3 8 C3 6.5 9 6.5 9 8 L9 13 L7.5 13 L7.5 18 L4.5 18 L4.5 13 L3 13 Z"
-      fill={filled ? 'currentColor' : '#ccc'}
+      fill={filled ? 'currentColor' : '#999'}
     />
   </svg>
 );
@@ -13,7 +13,6 @@ const PERSON_ICON = (filled) => (
 export default function RiskPictograph({ highlighted, total = 100, label, description, color = 'text-coral' }) {
   const [expanded, setExpanded] = useState(false);
 
-  // Render a 10x10 grid
   const rows = [];
   for (let row = 0; row < 10; row++) {
     const cols = [];
@@ -21,7 +20,7 @@ export default function RiskPictograph({ highlighted, total = 100, label, descri
       const index = row * 10 + col;
       const isFilled = index < highlighted;
       cols.push(
-        <span key={index} className={isFilled ? color : 'text-gray-300'}>
+        <span key={index} className={isFilled ? color : 'text-gray-400'}>
           {PERSON_ICON(isFilled)}
         </span>
       );
@@ -34,26 +33,32 @@ export default function RiskPictograph({ highlighted, total = 100, label, descri
   }
 
   return (
-    <div className="my-3 p-4 bg-white rounded-xl border border-gray-200 message-enter">
+    <div
+      className="my-3 p-4 bg-white rounded-xl border border-gray-200 message-enter"
+      role="figure"
+      aria-label={`${label}: ${highlighted} out of ${total} people. ${description}`}
+    >
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full text-left"
+        className="w-full text-left min-h-0"
+        aria-expanded={expanded}
+        aria-label={`${label}: ${highlighted} out of ${total}. ${expanded ? 'Tap to hide visual' : 'Tap to see visual'}`}
       >
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-semibold text-warmgray">{label}</span>
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-400" aria-hidden="true">
             {expanded ? 'Tap to hide' : 'Tap to see visual'}
           </span>
         </div>
         <p className="text-sm text-gray-600 mb-1">{description}</p>
         <div className="flex items-center gap-2 text-sm">
           <span className={`font-bold ${color}`}>{highlighted}</span>
-          <span className="text-gray-400">out of {total} people</span>
+          <span className="text-gray-500">out of {total} people</span>
         </div>
       </button>
 
       {expanded && (
-        <div className="mt-3 pt-3 border-t border-gray-100">
+        <div className="mt-3 pt-3 border-t border-gray-100" aria-hidden="true">
           <div className="flex flex-col gap-0.5 items-center">
             {rows}
           </div>
@@ -63,7 +68,7 @@ export default function RiskPictograph({ highlighted, total = 100, label, descri
               <span>Affected ({highlighted})</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="text-gray-300">{PERSON_ICON(false)}</span>
+              <span className="text-gray-400">{PERSON_ICON(false)}</span>
               <span>Not affected ({total - highlighted})</span>
             </div>
           </div>
@@ -73,7 +78,6 @@ export default function RiskPictograph({ highlighted, total = 100, label, descri
   );
 }
 
-// Detect risk statistics in a message and return pictograph configs
 export function detectRiskStats(text) {
   const stats = [];
   const lower = text.toLowerCase();

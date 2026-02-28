@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 function SummaryCard({ title, subtitle, icon, content, accentClass }) {
   const [copied, setCopied] = useState(false);
@@ -34,16 +34,22 @@ function SummaryCard({ title, subtitle, icon, content, accentClass }) {
         {content}
       </div>
 
-      <div className="no-print px-6 py-3 border-t border-gray-100 flex gap-3">
+      <div className="no-print px-6 py-4 border-t border-gray-100 flex gap-3">
         <button
           onClick={handleCopy}
-          className="flex-1 py-2 px-4 bg-gray-100 text-warmgray rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+          className="flex-1 py-3 px-4 bg-gray-100 text-warmgray rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+          aria-label="Copy summary to clipboard"
         >
-          {copied ? 'Copied!' : 'Copy'}
+          {copied ? (
+            <span role="status" aria-live="polite">Copied!</span>
+          ) : (
+            'Copy'
+          )}
         </button>
         <button
           onClick={() => window.print()}
-          className="flex-1 py-2 px-4 bg-gray-100 text-warmgray rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+          className="flex-1 py-3 px-4 bg-gray-100 text-warmgray rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+          aria-label="Print summary"
         >
           Print
         </button>
@@ -54,22 +60,51 @@ function SummaryCard({ title, subtitle, icon, content, accentClass }) {
 
 export default function HandoffSummary({ providerSummary, patientSummary, onBack, onRestart }) {
   const [tab, setTab] = useState('patient');
+  const patientTabRef = useRef(null);
+  const providerTabRef = useRef(null);
+
+  const handleTabKeyDown = (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const next = tab === 'patient' ? 'provider' : 'patient';
+      setTab(next);
+      (next === 'patient' ? patientTabRef : providerTabRef).current?.focus();
+    }
+  };
 
   return (
     <div className="flex-1 flex flex-col items-center px-4 py-6 overflow-y-auto chat-scroll">
-      {/* Tab switcher */}
-      <div className="no-print flex gap-1 bg-gray-100 rounded-xl p-1 mb-5 max-w-lg w-full">
+      {/* Accessible tab switcher */}
+      <div
+        className="no-print flex gap-1 bg-gray-100 rounded-xl p-1 mb-5 max-w-lg w-full"
+        role="tablist"
+        aria-label="Summary views"
+      >
         <button
+          ref={patientTabRef}
+          role="tab"
+          id="tab-patient"
+          aria-selected={tab === 'patient'}
+          aria-controls="panel-patient"
+          tabIndex={tab === 'patient' ? 0 : -1}
           onClick={() => setTab('patient')}
-          className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+          onKeyDown={handleTabKeyDown}
+          className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
             tab === 'patient' ? 'bg-white text-warmgray shadow-sm' : 'text-gray-500'
           }`}
         >
           Your Summary
         </button>
         <button
+          ref={providerTabRef}
+          role="tab"
+          id="tab-provider"
+          aria-selected={tab === 'provider'}
+          aria-controls="panel-provider"
+          tabIndex={tab === 'provider' ? 0 : -1}
           onClick={() => setTab('provider')}
-          className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
+          onKeyDown={handleTabKeyDown}
+          className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-colors ${
             tab === 'provider' ? 'bg-white text-warmgray shadow-sm' : 'text-gray-500'
           }`}
         >
@@ -78,23 +113,38 @@ export default function HandoffSummary({ providerSummary, patientSummary, onBack
       </div>
 
       <div className="handoff-summary max-w-lg w-full">
-        {tab === 'patient' ? (
-          <SummaryCard
-            title="Your Visit Summary"
-            subtitle="A recap of what we discussed"
-            icon="📝"
-            content={patientSummary}
-            accentClass="bg-teal"
-          />
-        ) : (
-          <SummaryCard
-            title="Visit Preparation Summary"
-            subtitle="For Dr. Trowbridge"
-            icon="📋"
-            content={providerSummary}
-            accentClass="bg-warmgray"
-          />
-        )}
+        <div
+          role="tabpanel"
+          id="panel-patient"
+          aria-labelledby="tab-patient"
+          hidden={tab !== 'patient'}
+        >
+          {tab === 'patient' && (
+            <SummaryCard
+              title="Your Visit Summary"
+              subtitle="A recap of what we discussed"
+              icon="📝"
+              content={patientSummary}
+              accentClass="bg-teal"
+            />
+          )}
+        </div>
+        <div
+          role="tabpanel"
+          id="panel-provider"
+          aria-labelledby="tab-provider"
+          hidden={tab !== 'provider'}
+        >
+          {tab === 'provider' && (
+            <SummaryCard
+              title="Visit Preparation Summary"
+              subtitle="For Dr. Trowbridge"
+              icon="📋"
+              content={providerSummary}
+              accentClass="bg-warmgray"
+            />
+          )}
+        </div>
       </div>
 
       <div className="no-print mt-6 space-y-3 text-center">
@@ -104,13 +154,13 @@ export default function HandoffSummary({ providerSummary, patientSummary, onBack
         <div className="flex gap-4 justify-center">
           <button
             onClick={onBack}
-            className="text-teal text-sm font-medium hover:underline"
+            className="text-teal text-sm font-medium hover:underline px-4 py-2"
           >
             Back to conversation
           </button>
           <button
             onClick={onRestart}
-            className="text-gray-400 text-sm font-medium hover:underline"
+            className="text-gray-400 text-sm font-medium hover:underline px-4 py-2"
           >
             Start over
           </button>

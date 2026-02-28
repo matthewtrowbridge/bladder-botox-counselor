@@ -13,14 +13,12 @@ export default function Header({ showRestart, onRestart, fontSizeLabel, onCycleF
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        {/* Font size toggle */}
+      <div className="flex items-center gap-2">
         {onCycleFont && (
           <button
             onClick={onCycleFont}
-            className="text-sm px-2.5 py-1.5 rounded-lg border border-gray-300 text-gray-500 hover:text-warmgray hover:border-gray-400 transition-colors font-semibold"
-            aria-label="Change text size"
-            title="Change text size"
+            className="btn-compact text-sm px-3 py-2 rounded-lg border border-gray-300 text-gray-500 hover:text-warmgray hover:border-gray-400 transition-colors font-semibold flex items-center justify-center"
+            aria-label={`Text size: ${fontSizeLabel}. Tap to change.`}
           >
             {fontSizeLabel || 'A'}
           </button>
@@ -29,7 +27,7 @@ export default function Header({ showRestart, onRestart, fontSizeLabel, onCycleF
         {showRestart && (
           <button
             onClick={onRestart}
-            className="text-sm text-gray-400 hover:text-warmgray transition-colors"
+            className="btn-compact text-sm px-3 py-2 text-gray-400 hover:text-warmgray transition-colors flex items-center justify-center"
             aria-label="Start new conversation"
           >
             Start over
