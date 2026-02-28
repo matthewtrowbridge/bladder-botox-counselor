@@ -2,7 +2,6 @@ import { useState } from 'react';
 import RiskPictograph, { detectRiskStats } from './RiskPictograph';
 import ProcedureTimeline, { shouldShowTimeline } from './ProcedureTimeline';
 import TreatmentCards, { shouldShowTreatmentCards } from './TreatmentCards';
-import Illustration, { getIllustrationTopic } from './Illustration';
 
 export default function MessageBubble({ role, content, index, speakingId, onSpeak, onRephrase }) {
   const isUser = role === 'user';
@@ -13,7 +12,6 @@ export default function MessageBubble({ role, content, index, speakingId, onSpea
   const riskStats = isAssistant ? detectRiskStats(content) : [];
   const showTimeline = isAssistant && shouldShowTimeline(content);
   const showTreatments = isAssistant && shouldShowTreatmentCards(content);
-  const illustrationTopic = isAssistant ? getIllustrationTopic(content) : null;
 
   return (
     <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'} message-enter`}>
@@ -36,7 +34,6 @@ export default function MessageBubble({ role, content, index, speakingId, onSpea
           ))}
           {showTimeline && <ProcedureTimeline />}
           {showTreatments && <TreatmentCards />}
-          {illustrationTopic && <Illustration topic={illustrationTopic} />}
         </div>
       )}
 
